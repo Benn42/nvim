@@ -4,6 +4,10 @@
 
 Configuration for Neovim environment
 
+## colorscheme
+
+* catppuccin
+
 ## Installed plugins
 
 * Lazy
