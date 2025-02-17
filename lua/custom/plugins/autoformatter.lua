@@ -28,6 +28,7 @@ return { -- Autoformat
       go = { 'gofmt' },
       javascript = { { 'prettierd', 'prettier' } },
       typescript = { { 'prettierd', 'prettier' } },
+      json = { { 'prettierd', 'prettier' } },
     },
   },
 }
