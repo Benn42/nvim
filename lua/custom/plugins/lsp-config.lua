@@ -80,6 +80,13 @@ return {
           },
         },
       },
+      golangci_lint_ls = {
+        init_options = {
+          cmd = { 'golangci-lint-langserver' },
+          root_dir = require('lspconfig').util.root_pattern('.git', 'go.mod'),
+          command = { 'golangci-lint', 'run', '--output.json.path', 'stdout', '--show-stats=false', '--issues-exit-code=1' },
+        },
+      },
       rust_analyzer = {},
       tsserver = { capabilities = capabilities },
       tailwindcss = {},
