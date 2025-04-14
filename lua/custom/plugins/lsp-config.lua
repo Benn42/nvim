@@ -83,10 +83,10 @@ return {
       golangci_lint_ls = {
         init_options = {
           cmd = { 'golangci-lint-langserver' },
-          root_dir = require('lspconfig').util.root_pattern('.git', 'go.mod'),
           command = { 'golangci-lint', 'run', '--output.json.path', 'stdout', '--show-stats=false', '--issues-exit-code=1' },
         },
       },
+      ols = {},
       rust_analyzer = {},
       tsserver = { capabilities = capabilities },
       tailwindcss = {},
@@ -123,6 +123,9 @@ return {
         function(server_name)
           local server = servers[server_name] or {}
           server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+          server.root_dir = (servers[server_name] or {}).root_dir
+          server.settings = (servers[server_name] or {}).settings
+          server.filetypes = (servers[server_name] or {}).filetypes
           require('lspconfig')[server_name].setup(server)
         end,
       },
