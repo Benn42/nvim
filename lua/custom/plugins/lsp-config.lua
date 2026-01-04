@@ -4,8 +4,8 @@ return {
     { 'williamboman/mason.nvim', config = true },
     'williamboman/mason-lspconfig.nvim',
     'WhoIsSethDaniel/mason-tool-installer.nvim',
-    { 'j-hui/fidget.nvim',       opts = {} },
-    { 'folke/neodev.nvim',       opts = {} },
+    { 'j-hui/fidget.nvim', opts = {} },
+    { 'folke/neodev.nvim', opts = {} },
   },
   config = function()
     vim.api.nvim_create_autocmd('LspAttach', {
@@ -115,6 +115,7 @@ return {
     local ensure_installed = vim.tbl_keys(servers or {})
     vim.list_extend(ensure_installed, {
       'stylua',
+      'ts_ls',
     })
     require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

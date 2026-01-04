@@ -1,6 +1,8 @@
 return { -- Highlight, edit, and navigate code
   'nvim-treesitter/nvim-treesitter',
+  main = 'nvim-treesitter.config',
   build = ':TSUpdate',
+  lazy = false,
   opts = {
     ensure_installed = { 'bash', 'c', 'go', 'html', 'lua', 'luadoc', 'markdown', 'rust', 'terraform', 'typescript', 'vim', 'vimdoc' },
     -- Autoinstall languages that are not installed
@@ -11,16 +13,62 @@ return { -- Highlight, edit, and navigate code
     },
     indent = { enable = true, disable = { 'ruby' } },
   },
-  config = function(_, opts)
-    require('nvim-treesitter.install').prefer_git = true
-    ---@diagnostic disable-next-line: missing-fields
-    require('nvim-treesitter.configs').setup(opts)
+  config = function()
+    local ts = require 'nvim-treesitter'
+    local parsers = {
+      'bash',
+      'comment',
+      'css',
+      'diff',
+      'dockerfile',
+      'elixir',
+      'git_config',
+      'gitcommit',
+      'gitignore',
+      'go',
+      'heex',
+      'hcl',
+      'html',
+      'http',
+      'java',
+      'javascript',
+      'jsdoc',
+      'json',
+      'lua',
+      'make',
+      'markdown',
+      'markdown_inline',
+      'python',
+      'regex',
+      'rst',
+      'rust',
+      'scss',
+      'ssh_config',
+      'sql',
+      'terraform',
+      'typst',
+      'toml',
+      'tsx',
+      'typescript',
+      'vim',
+      'vimdoc',
+      'yaml',
+    }
 
-    -- There are additional nvim-treesitter modules that you can use to interact
-    -- with nvim-treesitter. You should go explore a few and see what interests you:
-    --
-    --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-    --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-    --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+    for _, parser in ipairs(parsers) do
+      ts.install(parser)
+    end
+
+    vim.treesitter.language.register('groovy', 'Jenkinsfile')
+    vim.wo[0][0].foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.wo[0][0].foldmethod = 'expr'
+    vim.api.nvim_command 'set nofoldenable'
+
+    vim.api.nvim_create_autocmd('FileType', {
+      pattern = parsers,
+      callback = function()
+        vim.treesitter.start()
+      end,
+    })
   end,
 }
