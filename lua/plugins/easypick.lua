@@ -1,24 +1,27 @@
-vim.pack.add { 'https://github.com/axkirillov/easypick.nvim' }
+vim.api.nvim_create_user_command('Easypick', function(opts)
+  vim.pack.add { 'https://github.com/axkirillov/easypick.nvim' }
+  local easypick = require 'easypick'
 
-local easypick = require 'easypick'
+  local result = vim.system({ 'git', 'symbolic-ref', '--quiet', '--short', 'refs/remotes/origin/HEAD' }, { text = true }):wait()
+  local base_branch = result.code == 0 and result.stdout and vim.trim(result.stdout) or 'main'
 
-local get_default_branch = "git remote show origin | grep 'HEAD branch' | cut -d' ' -f5"
-local base_branch = vim.fn.system(get_default_branch) or 'main'
-
-require('easypick').setup {
-  pickers = {
-    {
-      name = 'changed_files',
-      command = 'git diff --name-only $(git merge-base HEAD ' .. base_branch .. ' )',
-      previewer = easypick.previewers.branch_diff { base_branch = base_branch },
+  easypick.setup {
+    pickers = {
+      {
+        name = 'changed_files',
+        command = 'git diff --name-only $(git merge-base HEAD ' .. vim.fn.shellescape(base_branch) .. ')',
+        previewer = easypick.previewers.branch_diff { base_branch = base_branch },
+      },
+      {
+        name = 'conflicts',
+        command = 'git diff --name-only --diff-filter=U --relative',
+        previewer = easypick.previewers.file_diff(),
+      },
     },
-    {
-      name = 'conflicts',
-      command = 'git diff --name-only --diff-filter=U --relative',
-      previewer = easypick.previewers.file_diff(),
-    },
-  },
-}
+  }
+
+  vim.cmd.Easypick(opts.args)
+end, { nargs = '*' })
 
 vim.keymap.set('n', '<leader>si', '<cmd>Easypick changed_files<CR>', { desc = '[S]earch G[I]t Changed Files' })
 vim.keymap.set('n', '<leader>so', '<cmd>Easypick conflicts<CR>', { desc = '[S]earch Git C[o]nflicts' })
