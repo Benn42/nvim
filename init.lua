@@ -1,6 +1,7 @@
 -- Options
 do
   vim.loader.enable()
+  vim.diagnostic.config { virtual_lines = true }
 
   vim.g.loaded_netrw = 1
   vim.g.loaded_netrwPlugin = 1
@@ -414,10 +415,25 @@ do
     ts_ls = {},
     tailwindcss = {},
     eslint = {
-      on_attach = function(_, bufnr)
+      on_attach = function(client, bufnr)
+        vim.api.nvim_buf_create_user_command(bufnr, 'LspEslintFixAll', function()
+          client:request_sync('workspace/executeCommand', {
+            command = 'eslint.applyAllFixes',
+            arguments = {
+              {
+                uri = vim.uri_from_bufnr(bufnr),
+                version = vim.lsp.util.buf_versions[bufnr],
+              },
+            },
+          }, nil, bufnr)
+        end, {})
+
+        local group = vim.api.nvim_create_augroup('eslint_fix', { clear = false })
+        vim.api.nvim_clear_autocmds { group = group, buffer = bufnr }
         vim.api.nvim_create_autocmd('BufWritePre', {
+          group = group,
           buffer = bufnr,
-          command = 'EslintFixAll',
+          command = 'LspEslintFixAll',
         })
       end,
     },
